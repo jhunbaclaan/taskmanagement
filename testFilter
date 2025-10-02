@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Task Manager</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        input,
+        select {
+            padding: 10px;
+            font-size: 16px;
+            width: 100%;
+        }
+
+        /* Only style the form submit button here; task-action buttons have their own styles. */
+        button[type="submit"] {
+            grid-column: span 2;
+            padding: 10px;
+            font-size: 16px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        li {
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .low {
+            background: #28a745;
+        }
+
+        .medium {
+            background: #ffc107;
+        }
+
+        .high {
+            background: #dc3545;
+        }
+
+        .task-details {
+            flex: 1;
+        }
+
+        .task-actions button {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Task Manager</h1>
+        <div id="filters"
+            style="margin-bottom:16px; display:grid; grid-template-columns: 1fr 1fr 1fr 120px; gap:8px; align-items:center;">
+            <input type="search" id="searchText" placeholder="Search tasks..." aria-label="Search tasks" />
+            <select id="filterPriority">
+                <option value="all">All Priorities</option>
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+            </select>
+            <select id="filterDue">
+                <option value="all">All Dates</option>
+                <option value="overdue">Overdue</option>
+                <option value="today">Due Today</option>
+                <option value="week">Due This Week</option>
+            </select>
+            <button id="clearFilters" type="button"
+                style="padding:8px;border-radius:6px;border:1px solid #ccc;background:#fff;cursor:pointer;">Clear
+                filters</button>
+        </div>
+        <form id="taskForm">
+            <input type="text" id="taskName" placeholder="Task name" required />
+            <input type="text" id="taskDescription" placeholder="Task Description" required />
+            <input type="text" id="taskNotes" placeholder="Task Notes" />
+            <input type="date" id="dueDate" required />
+            <select id="priority">
+                <option value="low">Low Priority</option>
+                <option value="medium">Medium Priority</option>
+                <option value="high">High Priority</option>
+            </select>
+            <input type="color" id="colorTag" value="#007bff" />
+            <button type="submit" id="submitButton">Add Task</button>
+            <button type="button" id="cancelEdit" style="display:none; background:#6c757d; grid-column: span 2;">Cancel
+                Edit</button>
+        </form>
+        <ul id="taskList"></ul>
+        <p id="emptyMessage" style="text-align:center;color:#666;display:none;margin-top:12px;">No tasks match your
+            filters.</p>
+    </div>
+
+    <script>
+        // State
+        const taskForm = document.getElementById('taskForm');
+        const taskList = document.getElementById('taskList');
+        const searchText = document.getElementById('searchText');
+        const filterPriority = document.getElementById('filterPriority');
+        const filterDue = document.getElementById('filterDue');
+        const clearFilters = document.getElementById('clearFilters');
+        const emptyMessage = document.getElementById('emptyMessage');
+
+        let tasks = [];
+
+        // Utilities
+        function saveTasks() {
+            try { localStorage.setItem('tasks', JSON.stringify(tasks)); } catch (e) { /* ignore */ }
+        }
+
+        function loadTasks() {
+            try { const raw = localStorage.getItem('tasks'); tasks = raw ? JSON.parse(raw) : []; } catch (e) { tasks = []; }
+        }
+
+        function parseDate(iso) {
+            // iso expected YYYY-MM-DD
+            const parts = iso.split('-');
+            if (parts.length !== 3) return null;
+            return new Date(parts[0], parts[1] - 1, parts[2]);
+        }
+
+        function isSameDay(a, b) {
+            return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+        }
+
+        function isToday(date) {
+            const today = new Date();
+            return isSameDay(date, today);
+        }
+
+        function isThisWeek(date) {
+            const now = new Date();
+            const start = new Date(now);
+            start.setDate(now.getDate() - now.getDay()); // Sunday start
+            start.setHours(0, 0, 0, 0);
+            const end = new Date(start);
+            end.setDate(start.getDate() + 7);
+            return date >= start && date < end;
+        }
+
+        function isOverdue(date) {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            return date < today;
+        }
+
+        // Rendering
+        function renderTasks() {
+            const q = (searchText.value || '').toLowerCase();
+            const p = filterPriority.value;
+            const d = filterDue.value;
+
+            taskList.innerHTML = '';
+
+            const filtered = tasks.filter(t => {
+                if (p !== 'all' && t.priority !== p) return false;
+                if (q) {
+                    const hay = (t.name + ' ' + t.description + ' ' + t.notes).toLowerCase();
+                    if (!hay.includes(q)) return false;
+                }
+                if (d !== 'all') {
+                    const dueDate = parseDate(t.date);
+                    if (!dueDate) return false;
+                    if (d === 'today' && !isToday(dueDate)) return false;
+                    if (d === 'week' && !isThisWeek(dueDate)) return false;
+                    if (d === 'overdue' && !isOverdue(dueDate)) return false;
+                }
+                return true;
+            });
+
+            filtered.forEach(t => {
+                const li = document.createElement('li');
+                li.className = t.priority;
+                li.style.borderLeft = `10px solid ${t.color}`;
+
+
+                li.innerHTML = `
+          <div class="task-details">
+            <strong>${escapeHtml(t.name)}</strong><br>
+            Due: ${t.date}<br>
+            Priority: ${t.priority.charAt(0).toUpperCase() + t.priority.slice(1)}<br>
+            Description: ${escapeHtml(t.description)}<br>
+            Notes: ${escapeHtml(t.notes)}<br>
+          </div>
+          <div class="task-actions">
+            <button data-action="edit" data-id="${t.id}">Edit</button>
+            <button data-action="delete" data-id="${t.id}">Delete</button>
+          </div>
+        `;
+
+                const editBtn = li.querySelector('button[data-action="edit"]');
+                const delBtn = li.querySelector('button[data-action="delete"]');
+                editBtn.addEventListener('click', () => startEdit(t.id));
+                delBtn.addEventListener('click', () => deleteTask(t.id));
+
+                taskList.appendChild(li);
+            });
+
+            // Show empty message when no tasks match
+            if (filtered.length === 0) {
+                emptyMessage.style.display = 'block';
+            } else {
+                emptyMessage.style.display = 'none';
+            }
+        }
+
+        function escapeHtml(s) {
+            return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+
+        function deleteTask(id) {
+            tasks = tasks.filter(t => t.id !== id);
+            saveTasks();
+            renderTasks();
+        }
+
+        // Edit support
+        let editingId = null;
+        const submitButton = document.getElementById('submitButton');
+        const cancelEdit = document.getElementById('cancelEdit');
+
+        function startEdit(id) {
+            const t = tasks.find(x => x.id === id);
+            if (!t) return;
+            editingId = id;
+            document.getElementById('taskName').value = t.name;
+            document.getElementById('taskDescription').value = t.description;
+            document.getElementById('taskNotes').value = t.notes;
+            document.getElementById('dueDate').value = t.date;
+            document.getElementById('priority').value = t.priority;
+            document.getElementById('colorTag').value = t.color;
+            submitButton.textContent = 'Update Task';
+            cancelEdit.style.display = 'block';
+        }
+
+        function stopEdit() {
+            editingId = null;
+            taskForm.reset();
+            submitButton.textContent = 'Add Task';
+            cancelEdit.style.display = 'none';
+        }
+
+        // Wire up filters
+        [searchText, filterPriority, filterDue].forEach(el => el.addEventListener('input', renderTasks));
+        clearFilters.addEventListener('click', () => {
+            searchText.value = '';
+            filterPriority.value = 'all';
+            filterDue.value = 'all';
+            renderTasks();
+            searchText.focus();
+        });
+
+        // Form handler
+        taskForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const name = document.getElementById('taskName').value.trim();
+            const description = document.getElementById('taskDescription').value.trim();
+            const notes = document.getElementById('taskNotes').value.trim();
+            const date = document.getElementById('dueDate').value;
+            const priority = document.getElementById('priority').value;
+            const color = document.getElementById('colorTag').value;
+
+            if (!name || !date) return;
+
+            if (editingId) {
+                // Update existing
+                const idx = tasks.findIndex(t => t.id === editingId);
+                if (idx !== -1) {
+                    tasks[idx] = { ...tasks[idx], name, description, notes, date, priority, color };
+                    saveTasks();
+                    stopEdit();
+                    renderTasks();
+                }
+            } else {
+                const task = {
+                    id: Date.now().toString(36) + Math.random().toString(36).slice(2, 8),
+                    name, description, notes, date, priority, color
+                };
+
+                tasks.push(task);
+                saveTasks();
+                renderTasks();
+                taskForm.reset();
+            }
+        });
+
+        cancelEdit.addEventListener('click', () => {
+            stopEdit();
+        });
+
+        // Init
+        loadTasks();
+        renderTasks();
+
+    </script>
+</body>
+
+</html>
