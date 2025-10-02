@@ -7,7 +7,7 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f4f4f4;
+      background: #007298;
       margin: 0;
       padding: 20px;
     }
@@ -43,7 +43,7 @@
       grid-column: span 2;
       padding: 10px;
       font-size: 16px;
-      background: #007bff;
+      background: #007298;
       color: white;
       border: none;
       border-radius: 4px;
@@ -65,9 +65,11 @@
       align-items: center;
     }
 
-    .low { background: #28a745; }
-    .medium { background: #ffc107; }
-    .high { background: #dc3545; }
+    .One{ background: #397dc9; }
+    .Two { background: #71B1C8; }
+    .Three { background: #dbe442; }
+    .Four { background: #ffc72c; }
+    .Five { background: #f7941d; }
 
     .task-details {
       flex: 1;
@@ -76,7 +78,7 @@
     .task-actions button {
       background: rgba(255,255,255,0.2);
       border: none;
-      color: white;
+      color: #71B1C8;
       padding: 5px 10px;
       border-radius: 4px;
       cursor: pointer;
@@ -92,9 +94,11 @@
       <input type="text" id="taskNotes" placeholder="Task Notes" optional />
       <input type="date" id="dueDate" required />
       <select id="priority">
-        <option value="low">Low Priority</option>
-        <option value="medium">Medium Priority</option>
-        <option value="high">High Priority</option>
+        <option value="One">1</option>
+        <option value="Two">2</option>
+        <option value="Three">3</option>
+        <option value="Four">4</option>
+        <option value="Five">5</option>
       </select>
       <input type="color" id="colorTag" value="#007bff" />
       <button type="submit">Add Task</button>
@@ -109,14 +113,17 @@
     taskForm.addEventListener('submit', function(e) {
       e.preventDefault();
 
+      // create variables for each field
       const name = document.getElementById('taskName').value.trim();
+      // variable for date of task creation
+      const creationDate = new Date().toLocaleDateString('li');
       const description = document.getElementById('taskDescription').value.trim();
       const notes = document.getElementById('taskNotes').value.trim();
-      const date = document.getElementById('dueDate').value;
+      const deadline = document.getElementById('dueDate').value;
       const priority = document.getElementById('priority').value;
       const color = document.getElementById('colorTag').value;
 
-      if (!name || !date) return;
+      if (!name || !deadline || !description) return;
 
       const li = document.createElement('li');
       li.className = priority;
@@ -125,7 +132,8 @@
       li.innerHTML = `
         <div class="task-details">
           <strong>${name}</strong><br>
-          Due: ${date}<br>
+          <strong>Created: ${creationDate}</strong><br>
+          Due: ${deadline}<br>
           Priority: ${priority.charAt(0).toUpperCase() + priority.slice(1)}<br>
           Description: ${description}<br>
           Notes: ${notes}<br>
