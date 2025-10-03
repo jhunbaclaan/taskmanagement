@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Task Manager</title>
+  <title>taskmanagement</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -16,7 +16,7 @@
       max-width: 700px;
       margin: auto;
       background: white;
-      padding: 20px;
+      padding: 60px;
       border-radius: 8px;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
@@ -87,11 +87,11 @@
 </head>
 <body>
   <div class="container">
-    <h1>Task Manager</h1>
+    <h1>taskmanagement</h1>
     <form id="taskForm">
       <input type="text" id="taskName" placeholder="Task name" required />
       <input type="text" id="taskDescription" placeholder="Task Description" required />
-      <input type="text" id="taskNotes" placeholder="Task Notes" optional />
+      <input type="text" id="taskNotes" placeholder="Task Notes" />
       <input type="date" id="dueDate" required />
       <select id="priority">
         <option value="One">1</option>
@@ -123,8 +123,11 @@
       const priority = document.getElementById('priority').value;
       const color = document.getElementById('colorTag').value;
 
+      // check for the required fields
+      // TODO: make it so that it displays "please fill out x!" whenever a required field is missing
       if (!name || !deadline || !description) return;
-
+      // check for notes (since notes is optional, just for the sake of cleanliness)
+      const havesNotes = notes ? `Notes:${notes}<br>` : "";
       const li = document.createElement('li');
       li.className = priority;
       li.style.borderLeft = `10px solid ${color}`;
@@ -136,7 +139,7 @@
           Due: ${deadline}<br>
           Priority: ${priority.charAt(0).toUpperCase() + priority.slice(1)}<br>
           Description: ${description}<br>
-          Notes: ${notes}<br>
+          ${havesNotes}
         </div>
         <div class="task-actions">
           <button onclick="this.parentElement.parentElement.remove()">Delete</button>
