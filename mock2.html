@@ -70,7 +70,7 @@
     form {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 10px;
+      gap: 20px;
       margin-bottom: 20px;
     }
 
@@ -117,7 +117,7 @@
     }
 
     .task-actions button {
-      background: rgba(255,255,255,0.2);
+      background: rgba(255,255,255,1);
       border: none;
       color: #71B1C8;
       padding: 5px 10px;
@@ -140,6 +140,7 @@
       <input type="text" id="taskName" placeholder="Task name" required />
       <input type="text" id="taskDescription" placeholder="Task Description" required />
       <input type="text" id="taskNotes" placeholder="Task Notes" />
+      <input type="text" id="category" placeholder="Category"/>
       <input type="date" id="dueDate" required />
       <select id="priority">
         <option value="One">1</option>
@@ -169,6 +170,7 @@
       const notes = document.getElementById('taskNotes').value.trim();
       const deadline = document.getElementById('dueDate').value;
       const priority = document.getElementById('priority').value;
+      const category = document.getElementById('category').value;
       const color = document.getElementById('colorTag').value;
 
       // check for the required fields
@@ -186,6 +188,7 @@
           <strong>Created: ${creationDate}</strong><br>
           Due: ${deadline}<br>
           Priority: ${priority.charAt(0).toUpperCase() + priority.slice(1)}<br>
+          Category: ${category}<br>
           Description: ${description}<br>
           ${havesNotes}
         </div>
