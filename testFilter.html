@@ -2,102 +2,151 @@
 <html lang="en">
 
 <head>
+  <!-- link for fonts -->
+  <link href='https://fonts.googleapis.com/css?family=Inter Tight' rel='stylesheet'>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Task Manager</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f4f4f4;
-            margin: 0;
-            padding: 20px;
-        }
+    body {
+      background-image: url('images/hpulogo.png');
+      background-repeat: no-repeat;
+      background-position: center 70%;
+      background-color: #7bcae5;
+      background-size: contain;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+    }
+        
+    header {
+      background-color: rgba(255, 255, 255, 0.5);
+      backdrop-filter: blur(5px);
+      padding: 3px;
+      margin-bottom: 20px;
+      border-bottom-left-radius: 20px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.6);
+    }
+    
+    .links{
+      list-style: none;
+      display: flex;
+      justify-content: right;
+      gap: 30px;
+      padding: 0;
+      margin: 0;
+    }
+    
+    .links a{
+      text-decoration: none;
+      color: #007298;
+      font-family: 'Inter Tight';
+      font-weight: bold;
+      font-size: 20px;
+      transition: color 0.2s;
+    }
+    
+    .links a:hover{
+      color: white;
+    }
+    
+    .links a.active{
+      text-decoration: underline;
+    }
+        
+    .container {
+      max-width: 700px;
+      margin: auto;
+      background-color: rgba(255, 255, 255, 0.7);
+      padding: 60px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
 
-        .container {
-            max-width: 700px;
-            margin: auto;
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-
-        h1 {
+    h1 {
             text-align: center;
             color: #333;
-        }
+    }
 
-        form {
+    form {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 10px;
             margin-bottom: 20px;
-        }
+    }
 
-        input,
-        select {
+    input,
+    select {
             padding: 10px;
             font-size: 16px;
             width: 100%;
-        }
+    }
 
-        /* Only style the form submit button here; task-action buttons have their own styles. */
-        button[type="submit"] {
-            grid-column: span 2;
-            padding: 10px;
-            font-size: 16px;
-            background: #007bff;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
+    /* Only style the form submit button here; task-action buttons have their own styles. */
+    button[type="submit"] {
+        grid-column: span 2;
+        padding: 10px;
+        font-size: 16px;
+        background: #007bff;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
 
-        ul {
-            list-style: none;
-            padding: 0;
-        }
+    ul {
+        list-style: none;
+        padding: 0;
+    }
 
-        li {
-            padding: 10px;
-            margin-bottom: 10px;
-            border-radius: 6px;
-            color: white;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+    li {
+         padding: 10px;
+         margin-bottom: 10px;
+         border-radius: 6px;
+         color: white;
+         display: flex;
+         justify-content: space-between;
+        align-items: center;
+    }
 
-        .low {
-            background: #28a745;
-        }
+    .low {
+        background: #28a745;
+    }
 
-        .medium {
-            background: #ffc107;
-        }
+     .medium {
+         background: #ffc107;
+    }
 
-        .high {
-            background: #dc3545;
-        }
+    .high {
+        background: #dc3545;
+    }
 
-        .task-details {
-            flex: 1;
-        }
+    .task-details {
+        flex: 1;
+    }
 
-        .task-actions button {
-            background: rgba(255, 255, 255, 0.2);
-            border: none;
-            color: white;
-            padding: 5px 10px;
-            border-radius: 4px;
-            cursor: pointer;
-        }
+    .task-actions button {
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 4px;
+        cursor: pointer;
+    }
     </style>
 </head>
 
 <body>
+    <header>
+      <nav>
+        <ul class = "links">
+          <li><a href= "mock2.html">Create Tasks</a></li>
+        </ul>
+      </nav>
+  </header>
     <div class="container">
-        <h1>Task Manager</h1>
+        <h1>Task Viewer</h1>
+        <h2>(task creation also exists here until database is implemented)</h2>
         <div id="filters"
             style="margin-bottom:16px; display:grid; grid-template-columns: 1fr 1fr 1fr 120px; gap:8px; align-items:center;">
             <input type="search" id="searchText" placeholder="Search tasks..." aria-label="Search tasks" />

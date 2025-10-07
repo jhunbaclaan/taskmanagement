@@ -1,24 +1,65 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <!-- link for fonts -->
+  <link href='https://fonts.googleapis.com/css?family=Inter Tight' rel='stylesheet'>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>taskmanagement</title>
   <style>
     body {
+      background-image: url('images/hpulogo.png');
+      background-repeat: no-repeat;
+      background-position: center 70%;
+      background-color: #7bcae5;
+      background-size: contain;
       font-family: Arial, sans-serif;
-      background: #007298;
       margin: 0;
       padding: 20px;
+    }
+    
+    header {
+      background-color: rgba(255, 255, 255, 0.5);
+      backdrop-filter: blur(5px);
+      padding: 3px;
+      margin-bottom: 20px;
+      border-bottom-left-radius: 20px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.6);
+    }
+    
+    .links{
+      list-style: none;
+      display: flex;
+      justify-content: right;
+      gap: 30px;
+      padding: 0;
+      margin: 0;
+    }
+    
+    .links a{
+      text-decoration: none;
+      color: #007298;
+      font-family: 'Inter Tight';
+      font-weight: bold;
+      font-size: 20px;
+      transition: color 0.2s;
+    }
+    
+    .links a:hover{
+      color: white;
+    }
+    
+    .links a.active{
+      text-decoration: underline;
     }
 
     .container {
       max-width: 700px;
       margin: auto;
-      background: white;
+      background-color: rgba(255, 255, 255, 0.7);
       padding: 60px;
       border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      box-shadow: 0 0 10px rgba(0,0,0,0.4);
     }
 
     h1 {
@@ -86,6 +127,13 @@
   </style>
 </head>
 <body>
+    <header>
+      <nav>
+        <ul class = "links">
+          <li><a href= "testFilter.html">View Tasks</a></li>
+        </ul>
+      </nav>
+  </header>
   <div class="container">
     <h1>taskmanagement</h1>
     <form id="taskForm">
