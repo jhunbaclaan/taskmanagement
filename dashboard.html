@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard — Task Manager</title>
+  <style>
+    :root {
+      --bg: #fafafa;
+      --card-bg: #ffffff;
+      --text-primary: #002856;
+      --text-secondary: #4f758b;
+      --border: #e3e5e8;
+      --accent: #3b82f6;
+      --base-font-size: 18px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { font-size: var(--base-font-size); }
+
+    body {
+      font-family: "Tahoma", "Verdana", sans-serif;
+      background-color: var(--bg);
+      color: var(--text-primary);
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      transition: font-size 0.2s ease;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.5rem 2.5rem;
+      border-bottom: 1px solid var(--border);
+      background-color: #71B1C8;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    header h1 {
+      color: white;
+      font-size: 1.8rem;
+      font-weight: 600;
+      margin: 0;
+    }
+
+    .header-controls {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .add-btn {
+      background-color: #007298;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 0.7rem 1.2rem;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    .add-btn:hover { background-color: #005a7a; }
+
+    .font-slider {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: white;
+      font-size: 0.9rem;
+    }
+
+    .font-slider input[type="range"] {
+      width: 120px;
+      cursor: pointer;
+      accent-color: #4f758b;
+    }
+
+    main {
+      flex: 1;
+      padding: 2rem 3rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    /* Filter + Search Section */
+    .filter-bar {
+      background-color: var(--card-bg);
+      border: 4px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem 1.5rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .filter-group {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    select, input[type="search"] {
+      padding: 0.6rem 1rem;
+      border: 3px solid var(--border);
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: border-color 0.2s ease;
+    }
+
+    select:focus, input:focus {
+      outline: none;
+      border-color: #4f758b;
+    }
+
+    /* Task List */
+    #taskList {
+      background-color: var(--card-bg);
+      border: 4px solid var(--border);
+      border-radius: 10px;
+      padding: 1.5rem 2rem;
+    }
+
+    .task-item {
+      border-bottom: 2px solid var(--border);
+      padding: 1rem 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .task-item:last-child { border-bottom: none; }
+
+    .task-info {
+      flex: 1;
+      min-width: 250px;
+    }
+
+    .task-title {
+      font-weight: 600;
+      font-size: 1.1rem;
+      color: var(--text-primary);
+    }
+
+    .task-meta {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+
+    .delete-btn {
+      background-color: #d9534f;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 0.5rem 1rem;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    .delete-btn:hover { background-color: #b52b27; }
+
+    .footer-note {
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      margin: 1rem 0 2rem;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>Task Dashboard</h1>
+    <div class="header-controls">
+      <div class="font-slider">
+        <label for="fontSizeSlider" style="color:white;">Text Size:</label>
+        <input type="range" id="fontSizeSlider" min="12" max="22" value="16" />
+      </div>
+      <button class="add-btn" onclick="window.location.href='create.html'">＋ Add Task</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- Filter and Search -->
+    <div class="filter-bar">
+      <div class="filter-group">
+        <label>Filter:</label>
+        <select id="filterCategory">
+          <option value="all">All Categories</option>
+          <option value="Work">Work</option>
+          <option value="Personal">Personal</option>
+          <option value="Social">Social</option>
+          <option value="Financial">Financial</option>
+          <option value="School">School</option>
+          <option value="Health">Health</option>
+        </select>
+
+        <select id="filterPriority">
+          <option value="all">All Priorities</option>
+          <option value="One">One (High)</option>
+          <option value="Two">Two</option>
+          <option value="Three">Three</option>
+          <option value="Four">Four</option>
+          <option value="Five">Five (Low)</option>
+        </select>
+
+        <select id="filterDeadline">
+          <option value="default">All Deadlines</option>
+          <option value="upcoming">Upcoming (Soonest First)</option>
+          <option value="past">Past Due</option>
+        </select>
+
+        <!-- ✅ Sorting -->
+        <select id="sortBy">
+          <option value="none">Sort By (Default)</option>
+          <option value="deadlineAsc">Deadline ↑</option>
+          <option value="deadlineDesc">Deadline ↓</option>
+          <option value="priorityAsc">Priority ↑</option>
+          <option value="priorityDesc">Priority ↓</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <input type="search" id="searchInput" placeholder="🔍 Search tasks..." />
+      </div>
+    </div>
+
+    <!-- Task List -->
+    <div id="taskList">
+      <h2 style="margin-bottom: 1rem;">My Tasks</h2>
+      <div id="taskContainer"></div>
+    </div>
+  </main>
+
+  <p class="footer-note">Filter, search, or sort your tasks with ease.</p>
+
+  <script>
+    // Accessibility: Font size control
+    const fontSlider = document.getElementById("fontSizeSlider");
+    fontSlider.addEventListener("input", function () {
+      document.documentElement.style.setProperty("--base-font-size", this.value + "px");
+    });
+
+    const taskContainer = document.getElementById("taskContainer");
+    const filterCategory = document.getElementById("filterCategory");
+    const filterPriority = document.getElementById("filterPriority");
+    const filterDeadline = document.getElementById("filterDeadline");
+    const sortBy = document.getElementById("sortBy");
+    const searchInput = document.getElementById("searchInput");
+
+    let tasks = [];
+
+    // Load and display tasks
+    window.addEventListener("DOMContentLoaded", () => {
+      tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+      displayTasks();
+    });
+
+    [filterCategory, filterPriority, filterDeadline, sortBy, searchInput].forEach(el => {
+      el.addEventListener("input", displayTasks);
+    });
+
+    function displayTasks() {
+      taskContainer.innerHTML = "";
+
+      if (tasks.length === 0) {
+        taskContainer.innerHTML = "<p style='color:#4f758b'>No tasks yet. Add one!</p>";
+        return;
+      }
+
+      let filtered = tasks.filter(t => {
+        const categoryMatch = filterCategory.value === "all" || t.category === filterCategory.value;
+        const priorityMatch = filterPriority.value === "all" || t.priority === filterPriority.value;
+        const searchMatch = t.taskName.toLowerCase().includes(searchInput.value.toLowerCase()) ||
+                            t.description.toLowerCase().includes(searchInput.value.toLowerCase());
+        return categoryMatch && priorityMatch && searchMatch;
+      });
+
+      // Deadline filter
+      const now = new Date();
+      if (filterDeadline.value === "upcoming") {
+        filtered = filtered.filter(t => new Date(t.deadline) >= now);
+      } else if (filterDeadline.value === "past") {
+        filtered = filtered.filter(t => new Date(t.deadline) < now);
+      }
+
+      // Sorting
+      if (sortBy.value === "deadlineAsc") {
+        filtered.sort((a, b) => new Date(a.deadline) - new Date(b.deadline));
+      } else if (sortBy.value === "deadlineDesc") {
+        filtered.sort((a, b) => new Date(b.deadline) - new Date(a.deadline));
+      } else if (sortBy.value === "priorityAsc") {
+        filtered.sort((a, b) => a.priority.localeCompare(b.priority));
+      } else if (sortBy.value === "priorityDesc") {
+        filtered.sort((a, b) => b.priority.localeCompare(a.priority));
+      }
+
+      if (filtered.length === 0) {
+        taskContainer.innerHTML = "<p style='color:#4f758b'>No tasks match your filters.</p>";
+        return;
+      }
+
+      filtered.forEach((t, i) => {
+        const div = document.createElement("div");
+        div.className = "task-item";
+        div.innerHTML = `
+          <div class="task-info">
+            <div class="task-title">${t.taskName}</div>
+            <div class="task-meta">
+              📅 ${t.deadline ? new Date(t.deadline).toLocaleDateString() : "No deadline"} |
+              🏷️ ${t.category} |
+              ⚡ Priority: ${t.priority}
+            </div>
+            <div class="task-meta">${t.description}</div>
+          </div>
+          <button class="delete-btn" onclick="deleteTask(${i})">Delete</button>
+        `;
+        taskContainer.appendChild(div);
+      });
+    }
+
+    function deleteTask(index) {
+      if (confirm("Are you sure you want to delete this task?")) {
+        tasks.splice(index, 1);
+        localStorage.setItem("tasks", JSON.stringify(tasks));
+        displayTasks();
+      }
+    }
+  </script>
+</body>
+</html>

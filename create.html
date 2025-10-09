@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Create Task — Modern Layout</title>
+  <style>
+    :root {
+      --bg: #fafafa;
+      --card-bg: #ffffff;
+      --text-primary: #002856;
+      --text-secondary: #002856;
+      --border: #e3e5e8;
+      --accent: #3b82f6;
+      --base-font-size: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      font-size: var(--base-font-size);
+    }
+
+    body {
+      font-family: "Tahoma", "Verdana", sans-serif;
+      background-color: var(--bg);
+      color: var(--text-primary);
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      transition: font-size 0.2s ease;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.5rem 2.5rem;
+      border-bottom: 1px solid var(--border);
+      background-color: #71B1C8;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    header h1 {
+      font-size: 1.8rem;
+      font-weight: 600;
+      margin: 0;
+
+    }
+
+    .header-controls {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .back-btn {
+      background-color: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 0.7rem 1.2rem;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    .back-btn:hover {
+      background-color: #2563eb;
+    }
+
+    .font-slider {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: white;
+      font-size: 0.9rem;
+     
+    }
+
+    .font-slider input[type="range"] {
+      width: 120px;
+      cursor: pointer;
+      accent-color: #4f758b;
+      
+    }
+
+    main {
+      flex: 1;
+      padding: 2rem 3rem;
+      display: flex;
+      gap: 2rem;
+      justify-content: space-between;
+    }
+
+    /* Left column */
+    .left-column {
+      flex: 2;
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+      background-color: var(--card-bg);
+      border: 4px solid var(--border);
+      border-radius: 10px;
+      padding: 1.5rem 2rem;
+    }
+
+    .left-column input,
+    .left-column textarea {
+      width: 100%;
+      border: 4px solid var(--border);
+      border-radius: 8px;
+      padding: 0.8rem;
+      font-size: 1rem;
+    }
+
+    .left-column textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    /* Right column */
+    .right-column {
+      flex: 1.2;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      background-color: var(--card-bg);
+      border: 4px solid var(--border);
+      border-radius: 10px;
+      padding: 1.5rem 2rem;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    label {
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      margin-bottom: 0.4rem;
+      
+    }
+
+    input,
+    select,
+    textarea {
+      padding: 0.7rem 0.9rem;
+      border: 4px solid var(--border);
+      border-radius: 8px;
+      font-size: 1rem;
+      color: var(--text-primary);
+      background-color: var(--card-bg);
+      transition: border-color 0.2s ease;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      outline: none;
+      border-color: #4f758b;
+    }
+
+    .submit-section {
+      margin-top: 2rem;
+      text-align: right;
+    }
+
+    .submit-btn {
+      background-color: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 0.9rem 1.5rem;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    .submit-btn:hover {
+      background-color: #2563eb;
+    }
+
+    .footer-note {
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      margin-top: 1.5rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1 style="color: white;">Add Tasks</h1>
+    <div class="header-controls">
+      <div class="font-slider">
+        <label for="fontSizeSlider" style="color: white;">Text Size:</label>
+        <input type="range" id="fontSizeSlider" min="12" max="22" value="16" />
+      </div>
+      <button style="background-color: #007298" class="back-btn" onclick="window.location.href='dashboard.html'">← Back to Dashboard</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- Left Column -->
+    <div class="left-column">
+      <div class="form-group">
+        <label for="taskName">Task Title *</label>
+        <input type="text" id="taskName" placeholder="Enter task title" required />
+      </div>
+
+      <div class="form-group">
+        <label for="description">Description *</label>
+        <textarea id="description" placeholder="Enter task details..." style="font-family: Tahoma, Verdana, sans-serif;" required></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="notes">Additional Notes <span style="color:#002856">(optional)</span></label>
+        <textarea id="notes" placeholder="Add any extra info, links, or reminders..." style="font-family: Tahoma, Verdana, sans-serif;"></textarea>
+      </div>
+    </div>
+
+    <!-- Right Column -->
+    <div class="right-column">
+      <div class="form-group">
+        <label for="deadline">Deadline *</label>
+        <input type="date" id="deadline" required />
+      </div>
+
+      <div class="form-group">
+        <label for="category">Category *</label>
+        <select id="category" required>
+          <option value="">Select Category</option>
+          <option value="Work">Work</option>
+          <option value="Personal">Personal</option>
+          <option value="Social">Social</option>
+          <option value="Financial">Financial</option>
+          <option value="School">School</option>
+          <option value="Health">Health</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="priority">Priority *</label>
+        <select id="priority" required>
+          <option value="">Select priority</option>
+          <option value="One">One (High)</option>
+          <option value="Two">Two</option>
+          <option value="Three">Three</option>
+          <option value="Four">Four</option>
+          <option value="Five">Five (Low)</option>
+        </select>
+      </div>
+
+      <div class="submit-section">
+        <button style="background-color: #007298;" type="submit" class="submit-btn" id="saveBtn">Save Task</button>
+      </div>
+    </div>
+  </main>
+
+  <p class="footer-note">All fields marked * are required</p>
+
+  <script>
+    // Font size accessibility control
+    const fontSlider = document.getElementById("fontSizeSlider");
+    fontSlider.addEventListener("input", function () {
+      document.documentElement.style.setProperty("--base-font-size", this.value + "px");
+    });
+
+    // Save task
+    document.getElementById('saveBtn').addEventListener('click', function (e) {
+      e.preventDefault();
+
+      const task = {
+        taskName: document.getElementById('taskName').value,
+        description: document.getElementById('description').value,
+        deadline: document.getElementById('deadline').value,
+        priority: document.getElementById('priority').value,
+        category: document.getElementById('category').value,
+        notes: document.getElementById('notes').value,
+        completed: false,
+      };
+
+      // Validation
+      if (!task.taskName || !task.description || !task.deadline || !task.priority || !task.category) {
+        alert('Please fill in all required fiheaelds.');
+        return;
+      }
+
+      const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+      tasks.push(task);
+      localStorage.setItem('tasks', JSON.stringify(tasks));
+
+      alert('✅ Task saved successfully!');
+      window.location.href = 'dashboard.html';
+    });
+  </script>
+</body>
+</html>
+
+
