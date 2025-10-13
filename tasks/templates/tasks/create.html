@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Create Task — Task Manager</title>
+  <style>
+    :root {
+      --bg: #fafafa;
+      --card-bg: #ffffff;
+      --text-primary: #002856;
+      --text-secondary: #4f758b;
+      --border: #e3e5e8;
+      --accent: #3b82f6;
+      --base-font-size: 18px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { font-size: var(--base-font-size); }
+
+    body {
+      font-family: "Tahoma", "Verdana", sans-serif;
+      background-color: var(--bg);
+      color: var(--text-primary);
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      transition: font-size 0.2s ease;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.5rem 2.5rem;
+      border-bottom: 1px solid var(--border);
+      background-color: #71B1C8;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    header h1 {
+      color: white;
+      font-size: 1.8rem;
+      font-weight: 600;
+      margin: 0;
+    }
+
+    .header-controls {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .add-btn, .back-btn {
+      background-color: #007298;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 0.7rem 1.2rem;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background-color 0.2s ease;
+    }
+
+    .add-btn:hover, .back-btn:hover { background-color: #005a7a; }
+
+    main {
+      flex: 1;
+      padding: 2rem 3rem;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    .form-card {
+      background-color: var(--card-bg);
+      border: 4px solid var(--border);
+      border-radius: 12px;
+      padding: 2.5rem 3rem;
+      width: 100%;
+      max-width: 850px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+
+    h2 {
+      text-align: center;
+      color: var(--accent);
+      margin-bottom: 2rem;
+      font-size: 1.8rem;
+    }
+
+    form {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem 2rem;
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      font-size: 1rem;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      font-size: 1rem;
+      background-color: #f9fbfd;
+      transition: border-color 0.2s ease;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    .full-width {
+      grid-column: span 2;
+    }
+
+    button {
+      grid-column: span 2;
+      background-color: #3b82f6;
+      color: white;
+      font-size: 1.1rem;
+      padding: 0.9rem;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    button:hover { background-color: #2563eb; }
+
+    .footer-note {
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      margin-top: 2rem;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>Create Task</h1>
+    <div class="header-controls">
+      <a href="{% url 'dashboard' %}" class="back-btn">← Back to Dashboard</a>
+    </div>
+  </header>
+
+  <main>
+    <div class="form-card">
+      <h2>New Task Details</h2>
+      <form method="POST" action="">
+        {% csrf_token %}
+        <div>
+          <label for="title">Title</label>
+          <input type="text" id="title" name="title" required>
+        </div>
+
+        <div>
+          <label for="deadline">Deadline</label>
+          <input type="date" id="deadline" name="deadline" required>
+        </div>
+
+        <div>
+          <label for="category">Category</label>
+          <select id="category" name="category" required>
+            <option value="">Select category</option>
+            <option value="Work">Work</option>
+            <option value="Personal">Personal</option>
+            <option value="Social">Social</option>
+            <option value="Financial">Financial</option>
+            <option value="School">School</option>
+            <option value="Health">Health</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="priority">Priority</label>
+          <select id="priority" name="priority" required>
+            <option value="">Select priority</option>
+            <option value="One">One (High)</option>
+            <option value="Two">Two</option>
+            <option value="Three">Three</option>
+            <option value="Four">Four</option>
+            <option value="Five">Five (Low)</option>
+          </select>
+        </div>
+
+        <div class="full-width">
+          <label for="description">Description</label>
+          <textarea id="description" name="description" required></textarea>
+        </div>
+
+        <div class="full-width">
+          <label for="notes">Notes (optional)</label>
+          <textarea id="notes" name="notes"></textarea>
+        </div>
+
+        <button type="submit">💾 Save Task</button>
+      </form>
+      <p class="footer-note">Fill in the task details and click save to add it to your dashboard.</p>
+    </div>
+  </main>
+</body>
+</html>
