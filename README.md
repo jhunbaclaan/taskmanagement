@@ -19,7 +19,6 @@ Tasks will have the following features:
 - Filtering
 - Local storage and access
 
-As more features are added, this section will be updated to match.
 # Installation and Use
 The installation and use of TaskMaster assumes that you have **basic** knowledge of
 your system's Command Line/Terminal. **It also assumes that you have the latest version of python (or python3 on macOS) installed
