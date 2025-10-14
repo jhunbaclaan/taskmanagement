@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -16,13 +15,9 @@
       --base-font-size: 18px;
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
-    html {
-      font-size: var(--base-font-size);
-    }
+    html { font-size: var(--base-font-size); }
 
     body {
       font-family: "Tahoma", "Verdana", sans-serif;
@@ -72,9 +67,7 @@
       transition: background-color 0.2s ease;
     }
 
-    .add-btn:hover {
-      background-color: #005a7a;
-    }
+    .add-btn:hover { background-color: #005a7a; }
 
     .font-slider {
       display: flex;
@@ -118,8 +111,7 @@
       flex-wrap: wrap;
     }
 
-    select,
-    input[type="search"] {
+    select, input[type="search"] {
       padding: 0.6rem 1rem;
       border: 3px solid var(--border);
       border-radius: 8px;
@@ -127,8 +119,7 @@
       transition: border-color 0.2s ease;
     }
 
-    select:focus,
-    input:focus {
+    select:focus, input:focus {
       outline: none;
       border-color: #4f758b;
     }
@@ -151,9 +142,7 @@
       gap: 1rem;
     }
 
-    .task-item:last-child {
-      border-bottom: none;
-    }
+    .task-item:last-child { border-bottom: none; }
 
     .task-info {
       flex: 1;
@@ -175,19 +164,22 @@
       display: flex;
       gap: 0.5rem;
     }
+    .duplicate-btn {
+       background-color: #008000;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 0.5rem 1rem;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+  }
 
-    .task-item.completed {
-      background-color: #0b9c0b96;
-    }
+    .duplicate-btn:hover {
+      background-color: #48c348;
+}
 
-    .task-item.completed .task-title {
-      text-decoration: line-through;
-      color: rgb(255, 255, 255);
-    }
-
-    .delete-btn,
-    .edit-btn,
-    .complete-btn {
+    .delete-btn, .edit-btn {
       border: none;
       border-radius: 8px;
       padding: 0.5rem 1rem;
@@ -196,38 +188,32 @@
       transition: background-color 0.2s ease;
     }
 
-    .complete-btn {
-      background-color: #049604;
-      color: white;
-    }
-
-    .complete-btn:hover {
-      background-color: #4cae4c;
-    }
-
     .delete-btn {
       background-color: #d9534f;
       color: white;
     }
 
-    .delete-btn:hover {
-      background-color: #b52b27;
-    }
+    .delete-btn:hover { background-color: #b52b27; }
 
     .edit-btn {
-      background-color: #f0ad4e;
+      background-color: #edb722;
       color: white;
     }
 
-    .edit-btn:hover {
-      background-color: #d98c23;
-    }
+    .edit-btn:hover { background-color: #f2a840; }
 
     .footer-note {
       text-align: center;
       color: var(--text-secondary);
       font-size: 0.85rem;
       margin: 1rem 0 2rem;
+    }
+
+    .task-item.completed .task-title,
+    .task-item.completed .task-meta {
+    text-decoration: line-through;
+    color: gray;
+    opacity: 0.7;
     }
   </style>
 </head>
@@ -273,6 +259,12 @@
           <option value="upcoming">Upcoming (Soonest First)</option>
           <option value="past">Past Due</option>
         </select>
+        
+        <select id="filterCompleted">
+          <option value="all">Completed & Not Completed</option>
+          <option value="completed">Completed</option>
+          <option value="not_completed">Not Completed</option>
+        </select>
 
         <!-- ✅ Sorting -->
         <select id="sortBy">
@@ -289,250 +281,297 @@
       </div>
     </div>
 
-    <!-- Task List -->
-    <div id="tasks">
-      <h2 style="margin-bottom: 1rem;">My Tasks</h2>
-      <div id="taskContainer">
-        <ul id="taskList">
-          {% for task in tasks %}
-          <li class="task-item" data-category="{{ task.category}}" data-priority="{{ task.priority }}"
-            data-deadline="{{ task.deadline }}">
-            <div class="task-info">
-              <div class="task-title">{{ task.title }}</div>
-              <div class="task-meta">
-                📅 {{ task.deadline|date:"M d, Y" }} |
-                🏷️ {{ task.category }} |
-                ⚡ Priority: {{ task.priority }}
-              </div>
-              <div class="task-meta">{{ task.description }}</div>
-              <div class="task-meta">{{ task.notes }}</div>
-            </div>
-            <div class="task-actions">
-              <button class="edit-btn" data-id="{{ task.id }}">Edit</button>
-              <button class="delete-btn" data-id="{{ task.id }}">Delete</button>
-              <button class="complete-btn" data-id="{{ task.id }}">Complete</button>
-            </div>
-          </li>
-          {% empty %}
-          <li>No tasks yet.</li>
-          {% endfor %}
-        </ul>
+   <!-- Task List -->
+<div id="tasks">
+  <h2 style="margin-bottom: 1rem;">My Tasks</h2>
+  <div id="taskContainer">
+   <ul id="taskList">
+  {% for task in tasks %}
+    <li class="task-item"
+        data-category = "{{ task.category}}"
+        data-priority = "{{ task.priority }}"
+        data-deadline = "{{ task.deadline }}">
 
+      <input type="checkbox" class="complete-checkbox" data-id="{{ task.id }}" {% if task.completed %}checked{% endif %}>
+
+      <div class="task-info">
+        <div class="task-title">{{ task.title }}</div>
+        <div class="task-meta">
+          📅 {{ task.deadline|date:"M d, Y" }} |
+          📋 {{ task.category }} |
+          📊 Priority: {{ task.priority }}
+        </div>
+        <div class="task-meta">{{ task.description }}</div>
+        <div class="task-meta">{{ task.notes }}</div>
       </div>
+    <div class="task-actions">
+      <button class="edit-btn" data-id="{{ task.id }}">Edit</button>
+      <button class="duplicate-btn" data-id="{{ task.id }}">Duplicate</button>
+      <button class="delete-btn" data-id="{{ task.id }}">Delete</button>
     </div>
-  </main>
+    </li>
+  {% empty %}
+    <li>No tasks yet.</li>
+  {% endfor %}
+</ul>
+
+  </div>
+</div>
+</main>
 
   <p class="footer-note">Filter, search, or sort your tasks with ease.</p>
 
-  <script>
-    // Font size slider (keep this)
-    const fontSlider = document.getElementById("fontSizeSlider");
-    fontSlider.addEventListener("input", function () {
-      document.documentElement.style.setProperty("--base-font-size", this.value + "px");
-    });
+<script>
+  // Font size slider (keep this)
+  const fontSlider = document.getElementById("fontSizeSlider");
+  fontSlider.addEventListener("input", function () {
+    document.documentElement.style.setProperty("--base-font-size", this.value + "px");
+  });
+  
+  const priorityMap = {
+    "one": 1, "1": 1,
+    "two": 2, "2": 2,
+    "three": 3, "3": 3,
+    "four": 4, "4": 4,
+    "five": 5, "5": 5
+  };
 
-    const priorityMap = {
-      "one": 1, "1": 1,
-      "two": 2, "2": 2,
-      "three": 3, "3": 3,
-      "four": 4, "4": 4,
-      "five": 5, "5": 5
-    };
+  function priorityToNumber(raw) {
+    if (raw === undefined || raw === null) return 999;
+    const key = String(raw).trim().toLowerCase();
+    // return mapped number if known, otherwise try numeric parse, otherwise large number
+    if (priorityMap.hasOwnProperty(key)) return priorityMap[key];
+    const n = Number(key);
+    return Number.isFinite(n) ? n : 999;
+  }
 
-    function priorityToNumber(raw) {
-      if (raw === undefined || raw === null) return 999;
-      const key = String(raw).trim().toLowerCase();
-      // return mapped number if known, otherwise try numeric parse, otherwise large number
-      if (priorityMap.hasOwnProperty(key)) return priorityMap[key];
-      const n = Number(key);
-      return Number.isFinite(n) ? n : 999;
-    }
+  // grab controls + container
+  const searchInput = document.getElementById("searchInput");
+  const filterCategory = document.getElementById("filterCategory");
+  const filterPriority = document.getElementById("filterPriority");
+  const filterDeadline = document.getElementById("filterDeadline");
+  const sortBy = document.getElementById("sortBy");
+  const taskList = document.getElementById("taskList");
 
-    // grab controls + container
-    const searchInput = document.getElementById("searchInput");
-    const filterCategory = document.getElementById("filterCategory");
-    const filterPriority = document.getElementById("filterPriority");
-    const filterDeadline = document.getElementById("filterDeadline");
-    const sortBy = document.getElementById("sortBy");
-    const taskList = document.getElementById("taskList");
+  function getTaskItems() {
+    return Array.from(taskList.querySelectorAll(".task-item"));
+  }
 
-    function getTaskItems() {
-      return Array.from(taskList.querySelectorAll(".task-item"));
-    }
+  function filterAndSortTasks() {
+    const searchText = (searchInput?.value || "").toLowerCase();
+    const category = filterCategory?.value || "all";
+    const priorityFilter = filterPriority?.value || "all";
+    const deadlineFilter = filterDeadline?.value || "default";
+    const sortValue = sortBy?.value || "none";
+    const completedFilter = document.getElementById("filterCompleted")?.value || "all";
+    const now = new Date();
 
-    function filterAndSortTasks() {
-      const searchText = (searchInput?.value || "").toLowerCase();
-      const category = filterCategory?.value || "all";
-      const priorityFilter = filterPriority?.value || "all";
-      const deadlineFilter = filterDeadline?.value || "default";
-      const sortValue = sortBy?.value || "none";
-      const now = new Date();
+    const tasks = getTaskItems();
 
-      const tasks = getTaskItems();
+    // --- FILTERING ---
+    tasks.forEach(task => {
+      const titleEl = task.querySelector(".task-title");
+      const metas = task.querySelectorAll(".task-meta");
+      const title = titleEl ? titleEl.textContent.toLowerCase() : "";
+      const desc = metas && metas.length >= 2 ? metas[1].textContent.toLowerCase() : (metas[0]?.textContent || "").toLowerCase();
+      const isCompleted = task.classList.contains("completed");
+      const taskCategory = task.dataset.category || "";
+      const taskPriorityRaw = task.dataset.priority;
+      const taskPriorityNum = priorityToNumber(taskPriorityRaw);
+      const taskDeadline = task.dataset.deadline ? new Date(task.dataset.deadline) : new Date(0);
 
-      // --- FILTERING ---
-      tasks.forEach(task => {
-        const titleEl = task.querySelector(".task-title");
-        const metas = task.querySelectorAll(".task-meta");
-        const title = titleEl ? titleEl.textContent.toLowerCase() : "";
-        const desc = metas && metas.length >= 2 ? metas[1].textContent.toLowerCase() : (metas[0]?.textContent || "").toLowerCase();
-        const taskCategory = task.dataset.category || "";
-        const taskPriorityRaw = task.dataset.priority;
-        const taskPriorityNum = priorityToNumber(taskPriorityRaw);
-        const taskDeadline = task.dataset.deadline ? new Date(task.dataset.deadline) : new Date(0);
+      let visible = true;
 
-        let visible = true;
+      // search
+      if (searchText && !(title.includes(searchText) || desc.includes(searchText))) visible = false;
 
-        // search
-        if (searchText && !(title.includes(searchText) || desc.includes(searchText))) visible = false;
+      // category filter
+      if (category !== "all" && taskCategory !== category) visible = false;
 
-        // category filter
-        if (category !== "all" && taskCategory !== category) visible = false;
-
-        // priority filter
-        if (priorityFilter !== "all") {
-          const filterNum = priorityToNumber(priorityFilter);
-          if (filterNum !== taskPriorityNum) visible = false;
-        }
-
-        // deadline filter
-        if (deadlineFilter === "upcoming" && taskDeadline < now) visible = false;
-        else if (deadlineFilter === "past" && taskDeadline >= now) visible = false;
-
-        task.style.display = visible ? "flex" : "none";
-      });
-
-      // --- SORTING ---
-      // Only sort visible tasks so hidden tasks keep their place
-      const visibleTasks = tasks.filter(t => t.style.display !== "none");
-
-      visibleTasks.sort((a, b) => {
-        // compute numeric priority values (lower = higher priority if you're using 1=High)
-        const pA = priorityToNumber(a.dataset.priority);
-        const pB = priorityToNumber(b.dataset.priority);
-
-        // compute deadlines (ms)
-        const dA = a.dataset.deadline ? new Date(a.dataset.deadline).getTime() : 0;
-        const dB = b.dataset.deadline ? new Date(b.dataset.deadline).getTime() : 0;
-
-        // Primary comparison depends on selected sort
-        switch (sortValue) {
-          case "priorityAsc":
-            // numeric ascending: 1,2,3,4,5
-            return (pA - pB) || (dA - dB); // tie-breaker: earlier deadline first
-          case "priorityDesc":
-            // numeric descending: 5,4,3,2,1
-            return (pB - pA) || (dA - dB);
-          case "deadlineAsc":
-            return (dA - dB) || (pA - pB);
-          case "deadlineDesc":
-            return (dB - dA) || (pA - pB);
-          default:
-            return 0;
-        }
-      });
-
-      // Re-append visible tasks in sorted order
-      visibleTasks.forEach(t => taskList.appendChild(t));
-    }
-
-    // wire up events
-    [searchInput, filterCategory, filterPriority, filterDeadline, sortBy].forEach(el => {
-      if (!el) return;
-      el.addEventListener("input", filterAndSortTasks);
-      el.addEventListener("change", filterAndSortTasks);
-    });
-
-    // initialize
-    document.addEventListener("DOMContentLoaded", filterAndSortTasks);
-
-    // Complete button — toggle UI and persist
-    document.addEventListener("DOMContentLoaded", () => {
-
-      function getCookie(name) {
-        // simple CSRF cookie reader for Django
-        const match = document.cookie.match(new RegExp('(^|; )' + name + '=([^;]+)'));
-        return match ? decodeURIComponent(match[2]) : null;
+      // priority filter
+      if (priorityFilter !== "all") {
+        const filterNum = priorityToNumber(priorityFilter);
+        if (filterNum !== taskPriorityNum) visible = false;
       }
-      const csrftoken = getCookie('csrftoken');
 
-      document.querySelectorAll(".complete-btn").forEach(btn => {
-        // initialize label/state from surrounding li[data-completed] if present
-        const taskItem = btn.closest(".task-item");
-        if (taskItem) {
-          const dataCompleted = taskItem.dataset.completed;
-          if (dataCompleted === "true" || dataCompleted === "True") {
-            taskItem.classList.add("completed");
-            btn.textContent = "Undo";
-          } else {
-            btn.textContent = "Complete";
-          }
+      // deadline filter
+      if (deadlineFilter === "upcoming" && taskDeadline < now) visible = false;
+      else if (deadlineFilter === "past" && taskDeadline >= now) visible = false;
+      
+      // completed filter
+      if (completedFilter === "completed" && !isCompleted) visible = false;
+      if (completedFilter === "not_completed" && isCompleted) visible = false;
+
+      task.style.display = visible ? "flex" : "none";
+    });
+
+    // --- SORTING ---
+    // Only sort visible tasks so hidden tasks keep their place
+    const visibleTasks = tasks.filter(t => t.style.display !== "none");
+
+    visibleTasks.sort((a, b) => {
+      // compute numeric priority values (lower = higher priority if you're using 1=High)
+      const pA = priorityToNumber(a.dataset.priority);
+      const pB = priorityToNumber(b.dataset.priority);
+
+      // compute deadlines (ms)
+      const dA = a.dataset.deadline ? new Date(a.dataset.deadline).getTime() : 0;
+      const dB = b.dataset.deadline ? new Date(b.dataset.deadline).getTime() : 0;
+
+      // Primary comparison depends on selected sort
+      switch (sortValue) {
+        case "priorityAsc":
+          // numeric ascending: 1,2,3,4,5
+          return (pA - pB) || (dA - dB); // tie-breaker: earlier deadline first
+        case "priorityDesc":
+          // numeric descending: 5,4,3,2,1
+          return (pB - pA) || (dA - dB);
+        case "deadlineAsc":
+          return (dA - dB) || (pA - pB);
+        case "deadlineDesc":
+          return (dB - dA) || (pA - pB);
+        default:
+          return 0;
+      }
+    });
+
+    // Re-append visible tasks in sorted order
+    visibleTasks.forEach(t => taskList.appendChild(t));
+  }
+
+  // wire up events
+  [searchInput, filterCategory, filterPriority, filterDeadline, sortBy, document.getElementById("filterCompleted")].forEach(el => {
+    if (!el) return;
+    el.addEventListener("input", filterAndSortTasks);
+    el.addEventListener("change", filterAndSortTasks);
+  });
+
+  // initialize
+  document.addEventListener("DOMContentLoaded", filterAndSortTasks);
+  
+  // EDITING TASKS
+  document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll(".edit-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const taskItem = btn.closest(".task-item");
+      const taskId = btn.dataset.id;
+
+      // Collect data from the task element
+      const title = taskItem.querySelector(".task-title").textContent.trim();
+      const metas = taskItem.querySelectorAll(".task-meta");
+      const description = metas.length > 1 ? metas[1].textContent.trim() : "";
+      const deadline = taskItem.dataset.deadline;
+      const category = taskItem.dataset.category;
+      const priority = taskItem.dataset.priority;
+
+      // Save in localStorage to use on create page
+      const editTask = { id: taskId, title, description, deadline, category, priority };
+      localStorage.setItem("editTask", JSON.stringify(editTask));
+
+      // Redirect to create page
+      window.location.href = "{% url 'create' %}";
+      });
+    });
+  });
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== "") {
+      const cookies = document.cookie.split(";");
+      for (let cookie of cookies) {
+        cookie = cookie.trim();
+        if (cookie.startsWith(name + "=")) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
         }
+      }
+    }
+    return cookieValue;
+  }
 
-        btn.addEventListener("click", async () => {
-          const taskItem = btn.closest(".task-item");
-          const taskId = btn.dataset.id;
-          if (!taskItem || !taskId) return;
+  document.querySelectorAll(".delete-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const id = btn.dataset.id;
+      if (confirm("Are you sure you want to delete this task?")) {
+        fetch(`/delete/${id}/`, {
+          method: "POST",
+          headers: {
+            "X-CSRFToken": getCookie("csrftoken"), // ✅ correct function
+          },
+        })
+          .then(res => {
+            if (res.ok) window.location.reload();
+            else alert("Error deleting task");
+          })
+          .catch(() => alert("Network error while deleting task."));
+      }
+    });
+  });
+  // DUPLICATE TASK
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll(".duplicate-btn").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const taskId = btn.dataset.id;
 
-          // optimistic UI toggle
-          const willComplete = !taskItem.classList.contains("completed");
-          taskItem.classList.toggle("completed", willComplete);
-          btn.textContent = willComplete ? "Undo" : "Complete";
+      // Send POST request to Django duplicate route
+      const response = await fetch(`/duplicate/${taskId}/`, {
+        method: "POST",
+        headers: {
+          "X-CSRFToken": getCookie("csrftoken"),
+        },
+      });
 
-          try {
-            const res = await fetch(`/complete/${taskId}/`, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': csrftoken || ''
-              },
-              body: JSON.stringify({ completed: willComplete })
-            });
-            if (!res.ok) {
-              // revert UI on failure
-              taskItem.classList.toggle("completed", !willComplete);
-              btn.textContent = !willComplete ? "Undo" : "Complete";
-              const text = await res.text().catch(() => res.statusText);
-              console.error('Failed to update task state:', res.status, text);
-              alert('Failed to update task state (server error).');
-            }
-          } catch (err) {
-            // network error -> revert UI
-            taskItem.classList.toggle("completed", !willComplete);
-            btn.textContent = !willComplete ? "Undo" : "Complete";
-            console.error('Network error while updating task state', err);
-            alert('Network error while updating task state.');
-          }
+      if (response.ok) {
+        location.reload(); // refresh to show new duplicated task
+      } else {
+        alert("Failed to duplicate task.");
+      }
+    });
+  });
+});
+
+// Helper to get CSRF token from cookie
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== "") {
+    const cookies = document.cookie.split(";");
+    for (let cookie of cookies) {
+      cookie = cookie.trim();
+      if (cookie.startsWith(name + "=")) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+}
+  // ✅ COMPLETE CHECKBOX BEHAVIOR
+  document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll(".complete-checkbox").forEach(checkbox => {
+      const taskItem = checkbox.closest(".task-item");
+
+      // Make sure it looks right when page loads
+      if (checkbox.checked) {
+        taskItem.classList.add("completed");
+      }
+
+      checkbox.addEventListener("change", async () => {
+        const id = checkbox.dataset.id;
+        taskItem.classList.toggle("completed", checkbox.checked);
+
+        // Send update to Django backend
+        await fetch(`/toggle_complete/${id}/`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCookie("csrftoken"),
+          },
+          body: JSON.stringify({ completed: checkbox.checked }),
         });
       });
     });
+  });
 
-    // EDITING TASKS
-    document.addEventListener("DOMContentLoaded", () => {
-      document.querySelectorAll(".edit-btn").forEach(btn => {
-        btn.addEventListener("click", () => {
-          const taskItem = btn.closest(".task-item");
-          const taskId = btn.dataset.id;
 
-          // Collect data from the task element
-          const title = taskItem.querySelector(".task-title").textContent.trim();
-          const metas = taskItem.querySelectorAll(".task-meta");
-          const description = metas.length > 1 ? metas[1].textContent.trim() : "";
-          const deadline = taskItem.dataset.deadline;
-          const category = taskItem.dataset.category;
-          const priority = taskItem.dataset.priority;
-
-          // Save in localStorage to use on create page
-          const editTask = { id: taskId, title, description, deadline, category, priority };
-          localStorage.setItem("editTask", JSON.stringify(editTask));
-
-          // Redirect to create page
-          window.location.href = "{% url 'create' %}";
-        });
-      });
-    });
-  </script>
-
+</script>
 </body>
-
 </html>
