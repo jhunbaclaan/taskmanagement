@@ -296,7 +296,24 @@
     document.documentElement.style.setProperty("--base-font-size", this.value + "px");
   });
   
-  // ===== FILTER, SEARCH, SORT =====
+  const priorityMap = {
+    "one": 1, "1": 1,
+    "two": 2, "2": 2,
+    "three": 3, "3": 3,
+    "four": 4, "4": 4,
+    "five": 5, "5": 5
+  };
+
+  function priorityToNumber(raw) {
+    if (raw === undefined || raw === null) return 999;
+    const key = String(raw).trim().toLowerCase();
+    // return mapped number if known, otherwise try numeric parse, otherwise large number
+    if (priorityMap.hasOwnProperty(key)) return priorityMap[key];
+    const n = Number(key);
+    return Number.isFinite(n) ? n : 999;
+  }
+
+  // grab controls + container
   const searchInput = document.getElementById("searchInput");
   const filterCategory = document.getElementById("filterCategory");
   const filterPriority = document.getElementById("filterPriority");
@@ -309,109 +326,89 @@
   }
 
   function filterAndSortTasks() {
-    const searchText = searchInput.value.toLowerCase();
-    const category = filterCategory.value;
-    const priority = filterPriority.value;
-    const deadline = filterDeadline.value;
-    const sortValue = sortBy.value;
+    const searchText = (searchInput?.value || "").toLowerCase();
+    const category = filterCategory?.value || "all";
+    const priorityFilter = filterPriority?.value || "all";
+    const deadlineFilter = filterDeadline?.value || "default";
+    const sortValue = sortBy?.value || "none";
     const now = new Date();
 
-    let tasks = getTaskItems();
+    const tasks = getTaskItems();
 
-    // === FILTERING ===
+    // --- FILTERING ---
     tasks.forEach(task => {
-      const title = task.querySelector(".task-title").textContent.toLowerCase();
-      const desc = task.querySelector(".task-meta:last-child").textContent.toLowerCase();
-      const taskCategory = task.dataset.category;
-      const taskPriority = task.dataset.priority;
-      const taskDeadline = new Date(task.dataset.deadline);
+      const titleEl = task.querySelector(".task-title");
+      const metas = task.querySelectorAll(".task-meta");
+      const title = titleEl ? titleEl.textContent.toLowerCase() : "";
+      const desc = metas && metas.length >= 2 ? metas[1].textContent.toLowerCase() : (metas[0]?.textContent || "").toLowerCase();
+      const taskCategory = task.dataset.category || "";
+      const taskPriorityRaw = task.dataset.priority;
+      const taskPriorityNum = priorityToNumber(taskPriorityRaw);
+      const taskDeadline = task.dataset.deadline ? new Date(task.dataset.deadline) : new Date(0);
 
       let visible = true;
 
-      // Text search
+      // search
       if (searchText && !(title.includes(searchText) || desc.includes(searchText))) visible = false;
 
-      // Category filter
+      // category filter
       if (category !== "all" && taskCategory !== category) visible = false;
 
-      // Priority filter
-      if (priority !== "all" && taskPriority !== priority) visible = false;
+      // priority filter
+      if (priorityFilter !== "all") {
+        const filterNum = priorityToNumber(priorityFilter);
+        if (filterNum !== taskPriorityNum) visible = false;
+      }
 
-      // Deadline filter
-      if (deadline === "upcoming" && taskDeadline < now) visible = false;
-      else if (deadline === "past" && taskDeadline >= now) visible = false;
+      // deadline filter
+      if (deadlineFilter === "upcoming" && taskDeadline < now) visible = false;
+      else if (deadlineFilter === "past" && taskDeadline >= now) visible = false;
 
       task.style.display = visible ? "flex" : "none";
     });
 
-    // === SORTING ===
-    let visibleTasks = tasks.filter(t => t.style.display !== "none");
+    // --- SORTING ---
+    // Only sort visible tasks so hidden tasks keep their place
+    const visibleTasks = tasks.filter(t => t.style.display !== "none");
 
     visibleTasks.sort((a, b) => {
-      const deadlineA = new Date(a.dataset.deadline);
-      const deadlineB = new Date(b.dataset.deadline);
-      const priorityA = parseInt(a.dataset.priority);
-      const priorityB = parseInt(b.dataset.priority);
+      // compute numeric priority values (lower = higher priority if you're using 1=High)
+      const pA = priorityToNumber(a.dataset.priority);
+      const pB = priorityToNumber(b.dataset.priority);
 
+      // compute deadlines (ms)
+      const dA = a.dataset.deadline ? new Date(a.dataset.deadline).getTime() : 0;
+      const dB = b.dataset.deadline ? new Date(b.dataset.deadline).getTime() : 0;
+
+      // Primary comparison depends on selected sort
       switch (sortValue) {
-        case "deadlineAsc": return deadlineA - deadlineB;
-        case "deadlineDesc": return deadlineB - deadlineA;
-        case "priorityAsc": return priorityA - priorityB;
-        case "priorityDesc": return priorityB - priorityA;
-        default: return 0;
+        case "priorityAsc":
+          // numeric ascending: 1,2,3,4,5
+          return (pA - pB) || (dA - dB); // tie-breaker: earlier deadline first
+        case "priorityDesc":
+          // numeric descending: 5,4,3,2,1
+          return (pB - pA) || (dA - dB);
+        case "deadlineAsc":
+          return (dA - dB) || (pA - pB);
+        case "deadlineDesc":
+          return (dB - dA) || (pA - pB);
+        default:
+          return 0;
       }
     });
 
-    // Re-append sorted visible tasks in correct order
-    visibleTasks.forEach(task => taskList.appendChild(task));
+    // Re-append visible tasks in sorted order
+    visibleTasks.forEach(t => taskList.appendChild(t));
   }
 
-  // Run filters/sort whenever inputs change
+  // wire up events
   [searchInput, filterCategory, filterPriority, filterDeadline, sortBy].forEach(el => {
+    if (!el) return;
     el.addEventListener("input", filterAndSortTasks);
     el.addEventListener("change", filterAndSortTasks);
   });
 
-  // ===== EDIT / DELETE =====
-  document.querySelectorAll(".edit-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const id = btn.dataset.id;
-      window.location.href = `/edit/${id}/`; // Django edit view
-    });
-  });
-
-  document.querySelectorAll(".delete-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const id = btn.dataset.id;
-      if (confirm("Are you sure you want to delete this task?")) {
-        fetch(`/delete/${id}/`, {
-          method: "POST",
-          headers: {
-            "X-CSRFToken": getCSRFToken(), // Django CSRF token
-          },
-        }).then(res => {
-          if (res.ok) window.location.reload();
-          else alert("Error deleting task");
-        });
-      }
-    });
-  });
-
-  // Helper to extract Django CSRF token
-  function getCSRFToken() {
-    const name = "csrftoken=";
-    const decoded = decodeURIComponent(document.cookie);
-    const cookies = decoded.split(';');
-    for (let cookie of cookies) {
-      cookie = cookie.trim();
-      if (cookie.startsWith(name)) {
-        return cookie.substring(name.length, cookie.length);
-      }
-    }
-    return "";
-  }
-
-  // Initialize on load
+  // initialize
   document.addEventListener("DOMContentLoaded", filterAndSortTasks);
 </script>
 
