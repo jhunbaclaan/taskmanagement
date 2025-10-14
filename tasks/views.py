@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from .models import Task
 
 def dashboard(request):
@@ -23,7 +23,20 @@ def create(request):
             priority=priority
         )
         return redirect("dashboard")
-
     return render(request, "tasks/create.html")
+
+def update_task(request, pk):
+    task = get_object_or_404(Task, pk = pk)
+    if request.method == "POST":
+        task.title = request.POST.get("title")
+        task.deadline = request.POST.get("deadline")
+        task.category = request.POST.get("category")
+        task.priority = request.POST.get("priority")
+        task.description = request.POST.get("description")
+        task.notes = request.POST.get("notes")
+        task.save()
+        return redirect("dashboard")
+    return render(request, "tasks/create.html", {'task': task})
+
 
 

@@ -218,5 +218,32 @@
       <p class="footer-note">Fill in the task details and click save to add it to your dashboard.</p>
     </div>
   </main>
+  <!-- EDITING TASKS -->
+  <script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const stored = localStorage.getItem("editTask");
+    if (!stored) return; // not editing, just creating
+
+    const task = JSON.parse(stored);
+
+    // Fill form fields
+    document.getElementById("title").value = task.title || "";
+    document.getElementById("deadline").value = task.deadline || "";
+    document.getElementById("category").value = task.category || "";
+    document.getElementById("priority").value = task.priority || "";
+    document.getElementById("description").value = task.description || "";
+
+    // Update heading + button to make it clear it's edit mode
+    document.querySelector("h2").textContent = "Edit Task Details";
+    document.querySelector("button[type='submit']").textContent = "💾 Update Task";
+
+    // Change form action dynamically
+    const form = document.querySelector("form");
+    form.action = `/update/${task.id}/`; // adjust to your Django route
+
+    // Clear localStorage so it's not reused accidentally
+    localStorage.removeItem("editTask");
+  });
+</script>
 </body>
 </html>

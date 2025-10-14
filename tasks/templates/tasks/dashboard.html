@@ -410,6 +410,31 @@
 
   // initialize
   document.addEventListener("DOMContentLoaded", filterAndSortTasks);
+  
+  // EDITING TASKS
+  document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll(".edit-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const taskItem = btn.closest(".task-item");
+      const taskId = btn.dataset.id;
+
+      // Collect data from the task element
+      const title = taskItem.querySelector(".task-title").textContent.trim();
+      const metas = taskItem.querySelectorAll(".task-meta");
+      const description = metas.length > 1 ? metas[1].textContent.trim() : "";
+      const deadline = taskItem.dataset.deadline;
+      const category = taskItem.dataset.category;
+      const priority = taskItem.dataset.priority;
+
+      // Save in localStorage to use on create page
+      const editTask = { id: taskId, title, description, deadline, category, priority };
+      localStorage.setItem("editTask", JSON.stringify(editTask));
+
+      // Redirect to create page
+      window.location.href = "{% url 'create' %}";
+      });
+    });
+  });
 </script>
 
 </body>
