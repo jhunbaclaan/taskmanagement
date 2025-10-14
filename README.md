@@ -24,7 +24,7 @@ The installation and use of TaskMaster assumes that you have **basic** knowledge
 your system's Command Line/Terminal. **It also assumes that you have the latest version of python (or python3 on macOS) installed
 on your system. If you do not have it installed, find their releases page [here](https://www.python.org/downloads/).**
 
-The only release of TaskMaster can be found under (filename). Download it and unpack in a place that you can easily access.
+The only release of TaskMaster can be found under taskmaster.zip. Download it and unpack in a place that you can easily access.
 
 After unpacking the .zip, navigate to its directory on your Command Line with 'cd'. Once you're at the base directory,
 use the following command:
