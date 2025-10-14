@@ -291,9 +291,10 @@
         data-category = "{{ task.category}}"
         data-priority = "{{ task.priority }}"
         data-deadline = "{{ task.deadline }}">
-
-      <input type="checkbox" class="complete-checkbox" data-id="{{ task.id }}" {% if task.completed %}checked{% endif %}>
-
+      <input type="checkbox" class="complete-checkbox"
+      data-id="{{ task.id }}"
+      data-url = "{% url 'toggle_complete' task.id %}"
+      {% if task.completed %}checked{% endif %}>
       <div class="task-info">
         <div class="task-title">{{ task.title }}</div>
         <div class="task-meta">
@@ -556,10 +557,11 @@ function getCookie(name) {
 
       checkbox.addEventListener("change", async () => {
         const id = checkbox.dataset.id;
+        const url = checkbox.dataset.url;
         taskItem.classList.toggle("completed", checkbox.checked);
 
         // Send update to Django backend
-        await fetch(`/toggle_complete/${id}/`, {
+        const response = await fetch(`/toggle_complete/${id}/`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -570,7 +572,6 @@ function getCookie(name) {
       });
     });
   });
-
 
 </script>
 </body>
