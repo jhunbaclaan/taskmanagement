@@ -5,7 +5,6 @@ urlpatterns = [
     path("", views.dashboard, name="dashboard"),
     path("create/", views.create, name="create"),
     path("update/<int:pk>/", views.update_task, name="update_task"),
-    #path("delete/<int:task_id>/", views.delete_task, name="delete_task"),
+    path("complete/<int:id>/", views.complete_task, name="complete_task"),
+    # path("delete/<int:task_id>/", views.delete_task, name="delete_task"),
 ]
-
-
