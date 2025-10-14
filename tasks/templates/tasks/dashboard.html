@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -15,9 +16,13 @@
       --base-font-size: 18px;
     }
 
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
 
-    html { font-size: var(--base-font-size); }
+    html {
+      font-size: var(--base-font-size);
+    }
 
     body {
       font-family: "Tahoma", "Verdana", sans-serif;
@@ -67,7 +72,9 @@
       transition: background-color 0.2s ease;
     }
 
-    .add-btn:hover { background-color: #005a7a; }
+    .add-btn:hover {
+      background-color: #005a7a;
+    }
 
     .font-slider {
       display: flex;
@@ -111,7 +118,8 @@
       flex-wrap: wrap;
     }
 
-    select, input[type="search"] {
+    select,
+    input[type="search"] {
       padding: 0.6rem 1rem;
       border: 3px solid var(--border);
       border-radius: 8px;
@@ -119,7 +127,8 @@
       transition: border-color 0.2s ease;
     }
 
-    select:focus, input:focus {
+    select:focus,
+    input:focus {
       outline: none;
       border-color: #4f758b;
     }
@@ -142,7 +151,9 @@
       gap: 1rem;
     }
 
-    .task-item:last-child { border-bottom: none; }
+    .task-item:last-child {
+      border-bottom: none;
+    }
 
     .task-info {
       flex: 1;
@@ -165,7 +176,18 @@
       gap: 0.5rem;
     }
 
-    .delete-btn, .edit-btn {
+    .task-item.completed {
+      background-color: #0b9c0b96;
+    }
+
+    .task-item.completed .task-title {
+      text-decoration: line-through;
+      color: rgb(255, 255, 255);
+    }
+
+    .delete-btn,
+    .edit-btn,
+    .complete-btn {
       border: none;
       border-radius: 8px;
       padding: 0.5rem 1rem;
@@ -174,19 +196,32 @@
       transition: background-color 0.2s ease;
     }
 
+    .complete-btn {
+      background-color: #049604;
+      color: white;
+    }
+
+    .complete-btn:hover {
+      background-color: #4cae4c;
+    }
+
     .delete-btn {
       background-color: #d9534f;
       color: white;
     }
 
-    .delete-btn:hover { background-color: #b52b27; }
+    .delete-btn:hover {
+      background-color: #b52b27;
+    }
 
     .edit-btn {
       background-color: #f0ad4e;
       color: white;
     }
 
-    .edit-btn:hover { background-color: #d98c23; }
+    .edit-btn:hover {
+      background-color: #d98c23;
+    }
 
     .footer-note {
       text-align: center;
@@ -254,194 +289,250 @@
       </div>
     </div>
 
-   <!-- Task List -->
-<div id="tasks">
-  <h2 style="margin-bottom: 1rem;">My Tasks</h2>
-  <div id="taskContainer">
-   <ul id="taskList">
-  {% for task in tasks %}
-    <li class="task-item"
-        data-category = "{{ task.category}}"
-        data-priority = "{{ task.priority }}"
-        data-deadline = "{{ task.deadline }}">
-      <div class="task-info">
-        <div class="task-title">{{ task.title }}</div>
-        <div class="task-meta">
-          📅 {{ task.deadline|date:"M d, Y" }} |
-          🏷️ {{ task.category }} |
-          ⚡ Priority: {{ task.priority }}
-        </div>
-        <div class="task-meta">{{ task.description }}</div>
-        <div class="task-meta">{{ task.notes }}</div>
-      </div>
-    <div class="task-actions">
-      <button class="edit-btn" data-id="{{ task.id }}">Edit</button>
-      <button class="delete-btn" data-id="{{ task.id }}">Delete</button>
-    </div>
-    </li>
-  {% empty %}
-    <li>No tasks yet.</li>
-  {% endfor %}
-</ul>
+    <!-- Task List -->
+    <div id="tasks">
+      <h2 style="margin-bottom: 1rem;">My Tasks</h2>
+      <div id="taskContainer">
+        <ul id="taskList">
+          {% for task in tasks %}
+          <li class="task-item" data-category="{{ task.category}}" data-priority="{{ task.priority }}"
+            data-deadline="{{ task.deadline }}">
+            <div class="task-info">
+              <div class="task-title">{{ task.title }}</div>
+              <div class="task-meta">
+                📅 {{ task.deadline|date:"M d, Y" }} |
+                🏷️ {{ task.category }} |
+                ⚡ Priority: {{ task.priority }}
+              </div>
+              <div class="task-meta">{{ task.description }}</div>
+              <div class="task-meta">{{ task.notes }}</div>
+            </div>
+            <div class="task-actions">
+              <button class="edit-btn" data-id="{{ task.id }}">Edit</button>
+              <button class="delete-btn" data-id="{{ task.id }}">Delete</button>
+              <button class="complete-btn" data-id="{{ task.id }}">Complete</button>
+            </div>
+          </li>
+          {% empty %}
+          <li>No tasks yet.</li>
+          {% endfor %}
+        </ul>
 
-  </div>
-</div>
-</main>
+      </div>
+    </div>
+  </main>
 
   <p class="footer-note">Filter, search, or sort your tasks with ease.</p>
 
-<script>
-  // Font size slider (keep this)
-  const fontSlider = document.getElementById("fontSizeSlider");
-  fontSlider.addEventListener("input", function () {
-    document.documentElement.style.setProperty("--base-font-size", this.value + "px");
-  });
-  
-  const priorityMap = {
-    "one": 1, "1": 1,
-    "two": 2, "2": 2,
-    "three": 3, "3": 3,
-    "four": 4, "4": 4,
-    "five": 5, "5": 5
-  };
-
-  function priorityToNumber(raw) {
-    if (raw === undefined || raw === null) return 999;
-    const key = String(raw).trim().toLowerCase();
-    // return mapped number if known, otherwise try numeric parse, otherwise large number
-    if (priorityMap.hasOwnProperty(key)) return priorityMap[key];
-    const n = Number(key);
-    return Number.isFinite(n) ? n : 999;
-  }
-
-  // grab controls + container
-  const searchInput = document.getElementById("searchInput");
-  const filterCategory = document.getElementById("filterCategory");
-  const filterPriority = document.getElementById("filterPriority");
-  const filterDeadline = document.getElementById("filterDeadline");
-  const sortBy = document.getElementById("sortBy");
-  const taskList = document.getElementById("taskList");
-
-  function getTaskItems() {
-    return Array.from(taskList.querySelectorAll(".task-item"));
-  }
-
-  function filterAndSortTasks() {
-    const searchText = (searchInput?.value || "").toLowerCase();
-    const category = filterCategory?.value || "all";
-    const priorityFilter = filterPriority?.value || "all";
-    const deadlineFilter = filterDeadline?.value || "default";
-    const sortValue = sortBy?.value || "none";
-    const now = new Date();
-
-    const tasks = getTaskItems();
-
-    // --- FILTERING ---
-    tasks.forEach(task => {
-      const titleEl = task.querySelector(".task-title");
-      const metas = task.querySelectorAll(".task-meta");
-      const title = titleEl ? titleEl.textContent.toLowerCase() : "";
-      const desc = metas && metas.length >= 2 ? metas[1].textContent.toLowerCase() : (metas[0]?.textContent || "").toLowerCase();
-      const taskCategory = task.dataset.category || "";
-      const taskPriorityRaw = task.dataset.priority;
-      const taskPriorityNum = priorityToNumber(taskPriorityRaw);
-      const taskDeadline = task.dataset.deadline ? new Date(task.dataset.deadline) : new Date(0);
-
-      let visible = true;
-
-      // search
-      if (searchText && !(title.includes(searchText) || desc.includes(searchText))) visible = false;
-
-      // category filter
-      if (category !== "all" && taskCategory !== category) visible = false;
-
-      // priority filter
-      if (priorityFilter !== "all") {
-        const filterNum = priorityToNumber(priorityFilter);
-        if (filterNum !== taskPriorityNum) visible = false;
-      }
-
-      // deadline filter
-      if (deadlineFilter === "upcoming" && taskDeadline < now) visible = false;
-      else if (deadlineFilter === "past" && taskDeadline >= now) visible = false;
-
-      task.style.display = visible ? "flex" : "none";
+  <script>
+    // Font size slider (keep this)
+    const fontSlider = document.getElementById("fontSizeSlider");
+    fontSlider.addEventListener("input", function () {
+      document.documentElement.style.setProperty("--base-font-size", this.value + "px");
     });
 
-    // --- SORTING ---
-    // Only sort visible tasks so hidden tasks keep their place
-    const visibleTasks = tasks.filter(t => t.style.display !== "none");
+    const priorityMap = {
+      "one": 1, "1": 1,
+      "two": 2, "2": 2,
+      "three": 3, "3": 3,
+      "four": 4, "4": 4,
+      "five": 5, "5": 5
+    };
 
-    visibleTasks.sort((a, b) => {
-      // compute numeric priority values (lower = higher priority if you're using 1=High)
-      const pA = priorityToNumber(a.dataset.priority);
-      const pB = priorityToNumber(b.dataset.priority);
+    function priorityToNumber(raw) {
+      if (raw === undefined || raw === null) return 999;
+      const key = String(raw).trim().toLowerCase();
+      // return mapped number if known, otherwise try numeric parse, otherwise large number
+      if (priorityMap.hasOwnProperty(key)) return priorityMap[key];
+      const n = Number(key);
+      return Number.isFinite(n) ? n : 999;
+    }
 
-      // compute deadlines (ms)
-      const dA = a.dataset.deadline ? new Date(a.dataset.deadline).getTime() : 0;
-      const dB = b.dataset.deadline ? new Date(b.dataset.deadline).getTime() : 0;
+    // grab controls + container
+    const searchInput = document.getElementById("searchInput");
+    const filterCategory = document.getElementById("filterCategory");
+    const filterPriority = document.getElementById("filterPriority");
+    const filterDeadline = document.getElementById("filterDeadline");
+    const sortBy = document.getElementById("sortBy");
+    const taskList = document.getElementById("taskList");
 
-      // Primary comparison depends on selected sort
-      switch (sortValue) {
-        case "priorityAsc":
-          // numeric ascending: 1,2,3,4,5
-          return (pA - pB) || (dA - dB); // tie-breaker: earlier deadline first
-        case "priorityDesc":
-          // numeric descending: 5,4,3,2,1
-          return (pB - pA) || (dA - dB);
-        case "deadlineAsc":
-          return (dA - dB) || (pA - pB);
-        case "deadlineDesc":
-          return (dB - dA) || (pA - pB);
-        default:
-          return 0;
-      }
+    function getTaskItems() {
+      return Array.from(taskList.querySelectorAll(".task-item"));
+    }
+
+    function filterAndSortTasks() {
+      const searchText = (searchInput?.value || "").toLowerCase();
+      const category = filterCategory?.value || "all";
+      const priorityFilter = filterPriority?.value || "all";
+      const deadlineFilter = filterDeadline?.value || "default";
+      const sortValue = sortBy?.value || "none";
+      const now = new Date();
+
+      const tasks = getTaskItems();
+
+      // --- FILTERING ---
+      tasks.forEach(task => {
+        const titleEl = task.querySelector(".task-title");
+        const metas = task.querySelectorAll(".task-meta");
+        const title = titleEl ? titleEl.textContent.toLowerCase() : "";
+        const desc = metas && metas.length >= 2 ? metas[1].textContent.toLowerCase() : (metas[0]?.textContent || "").toLowerCase();
+        const taskCategory = task.dataset.category || "";
+        const taskPriorityRaw = task.dataset.priority;
+        const taskPriorityNum = priorityToNumber(taskPriorityRaw);
+        const taskDeadline = task.dataset.deadline ? new Date(task.dataset.deadline) : new Date(0);
+
+        let visible = true;
+
+        // search
+        if (searchText && !(title.includes(searchText) || desc.includes(searchText))) visible = false;
+
+        // category filter
+        if (category !== "all" && taskCategory !== category) visible = false;
+
+        // priority filter
+        if (priorityFilter !== "all") {
+          const filterNum = priorityToNumber(priorityFilter);
+          if (filterNum !== taskPriorityNum) visible = false;
+        }
+
+        // deadline filter
+        if (deadlineFilter === "upcoming" && taskDeadline < now) visible = false;
+        else if (deadlineFilter === "past" && taskDeadline >= now) visible = false;
+
+        task.style.display = visible ? "flex" : "none";
+      });
+
+      // --- SORTING ---
+      // Only sort visible tasks so hidden tasks keep their place
+      const visibleTasks = tasks.filter(t => t.style.display !== "none");
+
+      visibleTasks.sort((a, b) => {
+        // compute numeric priority values (lower = higher priority if you're using 1=High)
+        const pA = priorityToNumber(a.dataset.priority);
+        const pB = priorityToNumber(b.dataset.priority);
+
+        // compute deadlines (ms)
+        const dA = a.dataset.deadline ? new Date(a.dataset.deadline).getTime() : 0;
+        const dB = b.dataset.deadline ? new Date(b.dataset.deadline).getTime() : 0;
+
+        // Primary comparison depends on selected sort
+        switch (sortValue) {
+          case "priorityAsc":
+            // numeric ascending: 1,2,3,4,5
+            return (pA - pB) || (dA - dB); // tie-breaker: earlier deadline first
+          case "priorityDesc":
+            // numeric descending: 5,4,3,2,1
+            return (pB - pA) || (dA - dB);
+          case "deadlineAsc":
+            return (dA - dB) || (pA - pB);
+          case "deadlineDesc":
+            return (dB - dA) || (pA - pB);
+          default:
+            return 0;
+        }
+      });
+
+      // Re-append visible tasks in sorted order
+      visibleTasks.forEach(t => taskList.appendChild(t));
+    }
+
+    // wire up events
+    [searchInput, filterCategory, filterPriority, filterDeadline, sortBy].forEach(el => {
+      if (!el) return;
+      el.addEventListener("input", filterAndSortTasks);
+      el.addEventListener("change", filterAndSortTasks);
     });
 
-    // Re-append visible tasks in sorted order
-    visibleTasks.forEach(t => taskList.appendChild(t));
-  }
+    // initialize
+    document.addEventListener("DOMContentLoaded", filterAndSortTasks);
 
-  // wire up events
-  [searchInput, filterCategory, filterPriority, filterDeadline, sortBy].forEach(el => {
-    if (!el) return;
-    el.addEventListener("input", filterAndSortTasks);
-    el.addEventListener("change", filterAndSortTasks);
-  });
+    // Complete button — toggle UI and persist
+    document.addEventListener("DOMContentLoaded", () => {
 
-  // initialize
-  document.addEventListener("DOMContentLoaded", filterAndSortTasks);
-  
-  // EDITING TASKS
-  document.addEventListener("DOMContentLoaded", () => {
-  document.querySelectorAll(".edit-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const taskItem = btn.closest(".task-item");
-      const taskId = btn.dataset.id;
+      function getCookie(name) {
+        // simple CSRF cookie reader for Django
+        const match = document.cookie.match(new RegExp('(^|; )' + name + '=([^;]+)'));
+        return match ? decodeURIComponent(match[2]) : null;
+      }
+      const csrftoken = getCookie('csrftoken');
 
-      // Collect data from the task element
-      const title = taskItem.querySelector(".task-title").textContent.trim();
-      const metas = taskItem.querySelectorAll(".task-meta");
-      const description = metas.length > 1 ? metas[1].textContent.trim() : "";
-      const deadline = taskItem.dataset.deadline;
-      const category = taskItem.dataset.category;
-      const priority = taskItem.dataset.priority;
+      document.querySelectorAll(".complete-btn").forEach(btn => {
+        // initialize label/state from surrounding li[data-completed] if present
+        const taskItem = btn.closest(".task-item");
+        if (taskItem) {
+          const dataCompleted = taskItem.dataset.completed;
+          if (dataCompleted === "true" || dataCompleted === "True") {
+            taskItem.classList.add("completed");
+            btn.textContent = "Undo";
+          } else {
+            btn.textContent = "Complete";
+          }
+        }
 
-      // Save in localStorage to use on create page
-      const editTask = { id: taskId, title, description, deadline, category, priority };
-      localStorage.setItem("editTask", JSON.stringify(editTask));
+        btn.addEventListener("click", async () => {
+          const taskItem = btn.closest(".task-item");
+          const taskId = btn.dataset.id;
+          if (!taskItem || !taskId) return;
 
-      // Redirect to create page
-      window.location.href = "{% url 'create' %}";
+          // optimistic UI toggle
+          const willComplete = !taskItem.classList.contains("completed");
+          taskItem.classList.toggle("completed", willComplete);
+          btn.textContent = willComplete ? "Undo" : "Complete";
+
+          try {
+            const res = await fetch(`/complete/${taskId}/`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken || ''
+              },
+              body: JSON.stringify({ completed: willComplete })
+            });
+            if (!res.ok) {
+              // revert UI on failure
+              taskItem.classList.toggle("completed", !willComplete);
+              btn.textContent = !willComplete ? "Undo" : "Complete";
+              const text = await res.text().catch(() => res.statusText);
+              console.error('Failed to update task state:', res.status, text);
+              alert('Failed to update task state (server error).');
+            }
+          } catch (err) {
+            // network error -> revert UI
+            taskItem.classList.toggle("completed", !willComplete);
+            btn.textContent = !willComplete ? "Undo" : "Complete";
+            console.error('Network error while updating task state', err);
+            alert('Network error while updating task state.');
+          }
+        });
       });
     });
-  });
-</script>
+
+    // EDITING TASKS
+    document.addEventListener("DOMContentLoaded", () => {
+      document.querySelectorAll(".edit-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const taskItem = btn.closest(".task-item");
+          const taskId = btn.dataset.id;
+
+          // Collect data from the task element
+          const title = taskItem.querySelector(".task-title").textContent.trim();
+          const metas = taskItem.querySelectorAll(".task-meta");
+          const description = metas.length > 1 ? metas[1].textContent.trim() : "";
+          const deadline = taskItem.dataset.deadline;
+          const category = taskItem.dataset.category;
+          const priority = taskItem.dataset.priority;
+
+          // Save in localStorage to use on create page
+          const editTask = { id: taskId, title, description, deadline, category, priority };
+          localStorage.setItem("editTask", JSON.stringify(editTask));
+
+          // Redirect to create page
+          window.location.href = "{% url 'create' %}";
+        });
+      });
+    });
+  </script>
 
 </body>
+
 </html>
-
-
-
-
-
